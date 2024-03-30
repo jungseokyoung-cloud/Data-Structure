@@ -72,13 +72,10 @@ public extension SimpleLinkedList {
 	mutating func remove(after node: Node) -> T? {
 		guard !isEmpty else { return nil }
 		
+		if tail === node.next { tail = node }
+
 		let removeNode = node.next
-		
-		if tail === node.next {
-			tail = node
-		} else {
-			node.next = removeNode?.next
-		}
+		node.next = removeNode?.next
 		
 		return removeNode?.data
 	}
@@ -89,32 +86,22 @@ public extension SimpleLinkedList {
 	/// 연결리스트의 모든 값들을 list 형태로 리턴합니다.
 	func travelsal() -> [T] {
 		var values: [T?] = []
-		var node = head
-		
-		while node != nil {
-			values.append(node?.data)
-			node = node?.next
-		}
+		self.forEach { values.append($0.data) }
 		
 		return values.compactMap { $0 }
 	}
 	
 	/// `index`에 해당하는 연결리스트의 노드를 리턴합니다. `O(N)`
 	func node(at index: Int) -> Node? {
-		var node = head
-		
-		for _ in 0..<index {
-			node = node?.next
-			if node == nil { break }
-		}
-
-		return node
+		return self.enumerated()
+			.first { $0.offset == index }
+			.map { $0.element }
 	}
 }
 
 // MARK: - Sequence
 extension SimpleLinkedList: Sequence {
-	public func makeIterator() -> some IteratorProtocol {
+	public func makeIterator() -> SimpleLinkedListIterator<T> {
 		return SimpleLinkedListIterator(head: self.head)
 	}
 }
