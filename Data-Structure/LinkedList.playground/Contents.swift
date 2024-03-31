@@ -26,3 +26,30 @@ simple.travelsal()
 simple.append(2)
 
 simple.travelsal()
+
+/*
+ Double Linked List
+ */
+var double = DoubleLinkedList<Int>()
+
+double.append(1)
+
+double.append(2)
+double.append(2)
+double.append(3)
+double.append(2)
+double.append(2)
+double.append(2)
+
+
+double.remove(after: double.node(at: 2)!)
+double.insert(10, after: double.find(2)!)
+
+double.travalsel()
+
+double.pop_back()
+double.travalsel()
+
+double.append(10)
+double.travalsel()
+
