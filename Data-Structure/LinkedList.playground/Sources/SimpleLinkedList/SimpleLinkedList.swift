@@ -43,9 +43,10 @@ public extension SimpleLinkedList {
 	@discardableResult
 	/// 연결리스트의 맨 앞의 원소를 제거합니다. 제거한 후, 값을 리턴합니다. `O(1)`
 	mutating func pop_front() -> T? {
-		guard !isEmpty else { return nil }
-
-		defer { head = head?.next }
+		defer {
+			if head === tail { head = nil; tail = nil }
+			head = head?.next
+		}
 		
 		return head?.data
 	}
@@ -63,8 +64,8 @@ public extension SimpleLinkedList {
 			node = node?.next
 		}
 		
-		defer { node?.next = nil }
-		
+		defer { node?.next = nil; tail = node }
+
 		return node?.next?.data
 	}
 	
