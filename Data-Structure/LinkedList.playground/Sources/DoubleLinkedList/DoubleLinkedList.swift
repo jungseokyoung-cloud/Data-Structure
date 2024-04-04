@@ -49,10 +49,10 @@ public extension DoubleLinkedList {
 		guard !isEmpty else { return nil }
 		
 		defer {
+			if head === tail { head = nil; tail = nil }
+			
 			head?.next?.prev = nil
 			head = head?.next
-			
-			if isEmpty { head = nil; tail = nil }
 		}
 		
 		return head?.data

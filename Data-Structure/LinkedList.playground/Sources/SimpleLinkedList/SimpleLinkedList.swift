@@ -55,7 +55,6 @@ public extension SimpleLinkedList {
 	/// 연결리스트의 맨 뒤의 원소를 제거합니다. 제거한 후, 값을 리턴합니다. `O(N)`
 	mutating func pop_back() -> T? {
 		guard !isEmpty else { return nil }
-		
 		guard head?.next != nil else { return pop_front() }
 		
 		var node = head
