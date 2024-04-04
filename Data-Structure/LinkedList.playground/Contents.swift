@@ -1,6 +1,11 @@
-/*
- SimpleLinkedList
+/*:
+ ### Content
+ 1. [Simple Linked List](simple-linked-list)
+ 2. [Circuluar Linked List](circular-linked-list)
+ 3. [Double Linked List](Double-Linked-List)
  */
+
+//:### Simple Linked List
 var simple = SimpleLinkedList<Int>()
 simple.append(1)
 
@@ -27,9 +32,29 @@ simple.append(2)
 
 simple.travelsal()
 
-/*
- Double Linked List
- */
+//:### Circular Linked List
+var circle = CircularLinkedList<Int>()
+
+circle.append(1)
+circle.append(2)
+circle.append(3)
+
+circle.insert(10, after: circle.node(at: 2)!)
+
+circle.pop_front()
+circle.pop_back()
+circle.pop_front()
+circle.pop_back()
+circle.travelsal()
+
+circle.append(1)
+circle.append(2)
+circle.append(3)
+
+circle.remove(after: circle.node(at: 0)!)
+circle.travelsal()
+
+//:### Double Linked List
 var double = DoubleLinkedList<Int>()
 
 double.append(1)
