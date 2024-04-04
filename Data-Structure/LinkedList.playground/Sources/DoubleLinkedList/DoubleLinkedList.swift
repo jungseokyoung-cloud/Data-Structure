@@ -52,7 +52,7 @@ public extension DoubleLinkedList {
 			head?.next?.prev = nil
 			head = head?.next
 			
-			if isEmpty { tail = nil }
+			if isEmpty { head = nil; tail = nil }
 		}
 		
 		return head?.data
@@ -62,12 +62,11 @@ public extension DoubleLinkedList {
 	/// 연결리스트의 맨 뒤에 원소를 제거합니다. 제거한 후, 값을 리턴합니다. `O(1)`
 	mutating func pop_back() -> T? {
 		guard !isEmpty else { return nil }
-		
+		guard head?.next != nil else { return pop_front() }
+
 		defer {
 			tail?.prev?.next = nil
 			tail = tail?.prev
-			
-			if isEmpty { head = nil }
 		}
 		
 		return tail?.data
