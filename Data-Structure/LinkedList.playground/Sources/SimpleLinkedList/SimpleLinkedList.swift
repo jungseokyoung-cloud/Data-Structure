@@ -4,7 +4,7 @@ public struct SimpleLinkedList<T> {
 	public typealias Node = SimpleLinkedNode<T>
 	
 	private var head: Node?
-	private var tail: Node?
+	private weak var tail: Node?
 	
 	public var isEmpty: Bool { head == nil }
 	
@@ -27,14 +27,14 @@ public extension SimpleLinkedList {
 	}
 	
 	/// `after`뒤에 원소를 추가합니다. `O(1)`
-	mutating func insert(_ data: T, after node: Node?) {
+	mutating func insert(_ data: T, after node: Node) {
 		guard !isEmpty && node !== tail else {
 			append(data)
 			return
 		}
 		
-		let nextNode = node?.next
-		node?.next = Node(data: data, next: nextNode)
+		let nextNode = node.next
+		node.next = Node(data: data, next: nextNode)
 	}
 }
 
@@ -43,10 +43,7 @@ public extension SimpleLinkedList {
 	@discardableResult
 	/// 연결리스트의 맨 앞의 원소를 제거합니다. 제거한 후, 값을 리턴합니다. `O(1)`
 	mutating func pop_front() -> T? {
-		defer {
-			if head === tail { head = nil; tail = nil }
-			head = head?.next
-		}
+		defer { head = head?.next }
 		
 		return head?.data
 	}
@@ -55,7 +52,7 @@ public extension SimpleLinkedList {
 	/// 연결리스트의 맨 뒤의 원소를 제거합니다. 제거한 후, 값을 리턴합니다. `O(N)`
 	mutating func pop_back() -> T? {
 		guard !isEmpty else { return nil }
-		guard head?.next != nil else { return pop_front() }
+		guard head !== tail else { return pop_front() }
 		
 		var node = head
 		
@@ -76,17 +73,16 @@ public extension SimpleLinkedList {
 		
 		if tail === node.next { tail = node }
 		
-		let removeNode = node.next
-		node.next = removeNode?.next
-		
-		return removeNode?.data
+		defer { node.next = node.next?.next }
+	
+		return node.next?.data
 	}
 }
 
 // MARK: - Util Methods
 public extension SimpleLinkedList {
 	/// 연결리스트의 모든 값들을 list 형태로 리턴합니다.
-	func travelsal() -> [T] {
+	func traversal() -> [T] {
 		var values: [T?] = []
 		self.forEach { values.append($0.data) }
 		

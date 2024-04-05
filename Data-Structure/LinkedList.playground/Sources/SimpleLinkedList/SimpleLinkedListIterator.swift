@@ -11,5 +11,4 @@ public struct SimpleLinkedListIterator<T>: IteratorProtocol {
 		defer { self.current = thisCurrent.next }
 		return current
 	}
-
 }

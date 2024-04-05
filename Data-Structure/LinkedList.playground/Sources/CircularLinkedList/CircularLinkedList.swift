@@ -1,9 +1,9 @@
 /// 단순 연결 원형 리스트
-public struct CircularLinkedList<T: Equatable> {
+public struct CircularLinkedList<T> {
 	public typealias Node = SimpleLinkedNode<T>
 	
 	private var head: Node?
-	private var tail: Node?
+	private weak var tail: Node?
 	
 	public var isEmpty: Bool { head == nil }
 	
@@ -44,10 +44,7 @@ public extension CircularLinkedList {
 	/// 연결리스트의 맨 앞에 원소를 제거합니다. 제거한 후, 값을 리턴합니다. `O(1)`
 	mutating func pop_front() -> T? {
 		defer {
-			if head === tail {
-				head = nil
-				tail?.next = nil; tail = nil;
-			}
+			if head === tail { head = nil }
 			
 			head = head?.next
 			tail?.next = head
@@ -68,10 +65,7 @@ public extension CircularLinkedList {
 			node = node?.next
 		}
 		
-		defer {
-			node?.next = head
-			tail = node
-		}
+		defer { node?.next = head; tail = node }
 		
 		return node?.next?.data
 	}
@@ -91,7 +85,7 @@ public extension CircularLinkedList {
 // MARK: - Util Methods
 public extension CircularLinkedList {
 	/// 연결리스트의 모든 값들을 list 형태로 리턴합니다.
-	func travelsal() -> [T] {
+	func traversal() -> [T] {
 		guard !isEmpty else { return [] }
 		
 		var values: [T?] = []

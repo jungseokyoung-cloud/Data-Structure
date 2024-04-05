@@ -20,5 +20,4 @@ public struct DoubleLinkedListIterator<T: Equatable>: IteratorProtocol {
 		defer { self.currentTail = thisCurrent.prev }
 		return currentTail
 	}
-
 }
