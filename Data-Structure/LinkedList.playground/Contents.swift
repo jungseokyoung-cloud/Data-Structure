@@ -69,10 +69,10 @@ double.pop_back()
 double.pop_front()
 double.traversal()
 
-circle.append(1)
-circle.append(2)
-circle.append(3)
+double.append(1)
+double.append(2)
+double.append(3)
 
-circle.remove(after: circle.node(at: 0)!)double.traversal()
+double.remove(after: circle.node(at: 0)!)
 double.traversal()
 
