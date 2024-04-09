@@ -2,7 +2,7 @@
  ### Content
  1. [Simple Linked List](simple-linked-list)
  2. [Circuluar Linked List](circular-linked-list)
- 3. [Double Linked List](Double-Linked-List)
+ 3. [Double Linked List](double-linked-list)
  */
 
 //:### Simple Linked List

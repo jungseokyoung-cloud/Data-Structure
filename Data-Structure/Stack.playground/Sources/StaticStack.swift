@@ -32,7 +32,7 @@ public struct StaticStack<T>: Stack {
 	}
 }
 
-// MARK: - Methods
+// MARK: - Public Methods
 public extension StaticStack {
 	/// capacity를 넘어선 경우, stack overflow를 발생시킨다.
 	mutating func push(_ element: T) {
@@ -50,3 +50,4 @@ public extension StaticStack {
 		return elements[stackPointer] as? T
 	}
 }
+
