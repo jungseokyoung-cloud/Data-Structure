@@ -73,6 +73,6 @@ double.append(1)
 double.append(2)
 double.append(3)
 
-double.remove(after: circle.node(at: 0)!)
+double.remove(after: double.node(at: 0)!)
 double.traversal()
 
