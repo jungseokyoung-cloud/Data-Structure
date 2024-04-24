@@ -18,3 +18,24 @@ chain.find(for: "kim") // seoul
 
 chain.delete(for: "kim")
 chain.count // 0
+
+var openAddressing = OpenAddressingDictionary<String, String>()
+
+openAddressing.insert("seoul", with: "jung")
+
+openAddressing["jung"] = "busan"
+openAddressing["jung"] // busan
+openAddressing["kim"] // nil
+openAddressing.count // 1
+
+openAddressing["kim"] = "seoul"
+openAddressing.count // 2
+
+openAddressing["jung"] = nil
+openAddressing["jung"] // nil
+openAddressing.count // 1
+
+openAddressing.find(for: "kim") // seoul
+
+openAddressing.delete(for: "kim")
+openAddressing.count // 0
