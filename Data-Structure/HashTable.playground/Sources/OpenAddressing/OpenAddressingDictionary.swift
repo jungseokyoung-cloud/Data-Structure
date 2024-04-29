@@ -123,8 +123,8 @@ private extension OpenAddressingDictionary {
 	mutating func rehash(bucketCount: Int) {
 		let currentBuckets = buckets
 		
-		buckets = Array(repeating: nil, count: bucketCount * 2)
-		self.bucketCount = bucketCount * 2
+		buckets = Array(repeating: nil, count: bucketCount)
+		self.bucketCount = bucketCount
 		
 		
 		currentBuckets.forEach { element in
