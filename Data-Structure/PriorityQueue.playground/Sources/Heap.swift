@@ -73,7 +73,7 @@ private extension Heap {
 				candidate = left
 			}
 			
-			if right < nodes.count && sort(nodes[right], nodes[candidate]) {
+			if right < nodes.count && sort(nodes[right], nodes[candidate]) && sort(nodes[right], nodes[left]) {
 				candidate = right
 			}
 			
