@@ -9,6 +9,7 @@
 /* Begin PBXFileReference section */
 		FE52015A2BCCEA9B00972BD1 /* PriorityQueue.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = PriorityQueue.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		FE59E4242BC3AE9A00BFC61F /* Stack.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Stack.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		FEBAAAFF2BF73B50006F95BB /* Tree.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Tree.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		FEE743062BE8878000B3CE52 /* Graph.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Graph.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		FEF7C7A82BC9236000211B63 /* Queue.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Queue.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		FEF7DA5D2BD8C82800A3C275 /* HashTable.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = HashTable.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -19,6 +20,7 @@
 		FEFA45B12BB6A6A300F3448A = {
 			isa = PBXGroup;
 			children = (
+				FEBAAAFF2BF73B50006F95BB /* Tree.playground */,
 				FEE743062BE8878000B3CE52 /* Graph.playground */,
 				FEF7DA5D2BD8C82800A3C275 /* HashTable.playground */,
 				FE52015A2BCCEA9B00972BD1 /* PriorityQueue.playground */,
