@@ -1,20 +1,18 @@
 import Foundation
 
-public struct BinarySearchTree<T: Comparable> {
+public class BinarySearchTree<T: Comparable> {
 	/// 트리의 루트노드입니다.
-	private var root: Node<T>?
+	private(set) var root: Node<T>?
 	
-	public var isEmpty: Bool { count == 0 }
+	public var isEmpty: Bool { size == 0 }
 	
-	public private(set) var count: Int = 0
+	public private(set) var size: Int = 0
 	
 	public init() { }
-}
-
-// MARK: - Public Methods
-public extension BinarySearchTree {
+	
+	// MARK: - Insert Method
 	/// tree에 값을 추가합니다.
-	mutating func insert(_ value: T) {
+	public func insert(_ value: T) {
 		guard let root else {
 			self.root = Node(value: value)
 			return
@@ -24,7 +22,7 @@ public extension BinarySearchTree {
 		guard !contain(value) else { return }
 		
 		var current = root
-		count += 1
+		size += 1
 		while true {
 			if current.value > value {
 				if let next = current.left {
@@ -44,13 +42,10 @@ public extension BinarySearchTree {
 		}
 	}
 	
-	func contain(_ value: T) -> Bool {
-		return search(value) != nil
-	}
-	
-	mutating func remove(_ value: T) -> T? {
+	// MARK: - Remove Method
+	public func remove(_ value: T) -> T? {
 		guard let node = search(value) else { return nil }
-		count -= 1
+		defer { size -= 1 }
 
 		// 리프 노드인 경우
 		if node.left == nil && node.right == nil {
@@ -68,8 +63,14 @@ public extension BinarySearchTree {
 		} else {
 			guard let rightNode = node.right else { return nil }
 			let successor = successor(from: rightNode)
+
 			return removeTwoChildNode(node, successor: successor)
 		}
+	}
+	
+	// MARK: - Contain
+	public func contain(_ value: T) -> Bool {
+		return search(value) != nil
 	}
 }
 
@@ -93,9 +94,9 @@ private extension BinarySearchTree {
 		return nil
 	}
 	
-	mutating func removeLeafNode(_ node: Node<T>) -> T? {
+	func removeLeafNode(_ node: Node<T>) -> T? {
 		defer {
-			if node.parent?.left === node {
+			if node.isLeftChild {
 				node.parent?.left = nil
 			} else {
 				node.parent?.right = nil
@@ -107,13 +108,14 @@ private extension BinarySearchTree {
 		return node.value
 	}
 	
-	mutating func removeOneChildNode(_ node: Node<T>, child: Node<T>) -> T? {
+	func removeOneChildNode(_ node: Node<T>, child: Node<T>) -> T? {
 		defer {
-			if node.parent?.left === node {
-				node.parent?.left = child
+			if node.isLeftChild {
+				node.parent?.left = nil
 			} else {
-				node.parent?.right = child
+				node.parent?.right = nil
 			}
+			
 			child.parent = node.parent
 			
 			if node === root { root = child }
@@ -122,17 +124,21 @@ private extension BinarySearchTree {
 		return node.value
 	}
 	
-	mutating func removeTwoChildNode(_ node: Node<T>, successor: Node<T>) -> T? {
+	func removeTwoChildNode(_ node: Node<T>, successor: Node<T>) -> T? {
 		defer {
 			if node === root {
 				root = successor
-			} else if node.parent?.left === node {
+			} else if node.isLeftChild {
 				node.parent?.left = successor
 			} else {
 				node.parent?.right = successor
 			}
 			
-			successor.parent?.left = successor.right
+			if successor.isLeftChild {
+				successor.parent?.left = successor.right
+			} else {
+				successor.parent?.right = successor.right
+			}
 			
 			successor.left = node.left
 			successor.right = node.right
@@ -148,6 +154,13 @@ private extension BinarySearchTree {
 		while let leftNode = current.left { current = leftNode }
 		
 		return current
+	}
+}
+
+// MARK: - Internal Methods
+extension BinarySearchTree {
+	func setRoot(to node: Node<T>) {
+		self.root = node
 	}
 }
 
