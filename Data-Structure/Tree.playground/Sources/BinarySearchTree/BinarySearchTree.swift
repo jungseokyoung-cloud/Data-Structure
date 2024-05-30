@@ -13,13 +13,22 @@ public class BinarySearchTree<T: Comparable> {
 	// MARK: - Insert Method
 	/// tree에 값을 추가합니다.
 	public func insert(_ value: T) {
+		performInsert(value)
+	}
+	
+	/// Insert 작업을 수행한 후, 삽입된 노드를 리턴합니다.
+	@discardableResult
+	func performInsert(_ value: T) -> Node<T>? {
 		guard let root else {
 			self.root = Node(value: value)
-			return
+			return root
 		}
 		
 		// 이미 값이 존재하는 경우
-		guard !contain(value) else { return }
+		if let node = search(value) {
+			node.value = value
+			return node
+		}
 		
 		var current = root
 		size += 1
@@ -28,15 +37,19 @@ public class BinarySearchTree<T: Comparable> {
 				if let next = current.left {
 					current = next
 				} else {
-					current.left = Node(value: value, parent: current)
-					return
+					let node = Node(value: value, parent: current)
+					current.left = node
+					
+					return node
 				}
 			} else {
 				if let next = current.right {
 					current = next
 				} else {
-					current.right = Node(value: value, parent: current)
-					return
+					let node = Node(value: value, parent: current)
+					current.right = node
+					
+					return node
 				}
 			}
 		}
@@ -45,25 +58,34 @@ public class BinarySearchTree<T: Comparable> {
 	// MARK: - Remove Method
 	public func remove(_ value: T) -> T? {
 		guard let node = search(value) else { return nil }
+		
+		defer { performRemove(node: node) }
+		
+		return node.value
+	}
+	
+	/// Remove작업을 수행한 후, 삭제된 위치의 노드를 리턴합니다.
+	@discardableResult
+	func performRemove(node: Node<T>) -> Node<T>? {
 		defer { size -= 1 }
-
+		
 		// 리프 노드인 경우
-		if node.left == nil && node.right == nil {
+		if node.isLeaf {
 			return removeLeafNode(node)
 			
-		// 왼쪽 자식만 존재하는 경우
+			// 왼쪽 자식만 존재하는 경우
 		} else if let leftNode = node.left, node.right == nil {
 			return removeOneChildNode(node, child: leftNode)
 			
-		// 오른쪽 자식만 존재하는 경우
+			// 오른쪽 자식만 존재하는 경우
 		} else if let rightNode = node.right, node.left == nil {
 			return removeOneChildNode(node, child: rightNode)
-
-		// 자식이 두개인 노드인 경우
+			
+			// 자식이 두개인 노드인 경우
 		} else {
 			guard let rightNode = node.right else { return nil }
 			let successor = successor(from: rightNode)
-
+			
 			return removeTwoChildNode(node, successor: successor)
 		}
 	}
@@ -72,10 +94,7 @@ public class BinarySearchTree<T: Comparable> {
 	public func contain(_ value: T) -> Bool {
 		return search(value) != nil
 	}
-}
-
-// MARK: - Private Methods
-private extension BinarySearchTree {
+	
 	func search(_ value: T) -> Node<T>? {
 		guard root != nil else { return nil }
 		
@@ -94,7 +113,11 @@ private extension BinarySearchTree {
 		return nil
 	}
 	
-	func removeLeafNode(_ node: Node<T>) -> T? {
+}
+
+// MARK: - Private Methods
+private extension BinarySearchTree {
+	func removeLeafNode(_ node: Node<T>) -> Node<T>? {
 		defer {
 			if node.isLeftChild {
 				node.parent?.left = nil
@@ -104,48 +127,54 @@ private extension BinarySearchTree {
 			
 			if node === root { root = nil }
 		}
-
-		return node.value
+		
+		return node.parent
 	}
 	
-	func removeOneChildNode(_ node: Node<T>, child: Node<T>) -> T? {
+	func removeOneChildNode(_ node: Node<T>, child: Node<T>) -> Node<T>? {
 		defer {
 			if node.isLeftChild {
-				node.parent?.left = nil
+				node.parent?.left = child
 			} else {
-				node.parent?.right = nil
+				node.parent?.right = child
 			}
 			
 			child.parent = node.parent
 			
-			if node === root { root = child }
+			if node === root { setRoot(to: child) }
 		}
 		
-		return node.value
+		return child
 	}
 	
-	func removeTwoChildNode(_ node: Node<T>, successor: Node<T>) -> T? {
-		defer {
-			if node === root {
-				root = successor
-			} else if node.isLeftChild {
-				node.parent?.left = successor
-			} else {
-				node.parent?.right = successor
-			}
-			
-			if successor.isLeftChild {
-				successor.parent?.left = successor.right
-			} else {
-				successor.parent?.right = successor.right
-			}
-			
-			successor.left = node.left
-			successor.right = node.right
-			successor.parent = node.parent
+	func removeTwoChildNode(_ node: Node<T>, successor: Node<T>) -> Node<T>? {
+		var removedNode = successor.right == nil ? successor.parent : successor.right
+		if removedNode === node { removedNode = successor }
+		
+		if node.isLeftChild {
+			node.parent?.left = successor
+		} else {
+			node.parent?.right = successor
 		}
 		
-		return node.value
+		if successor.isLeftChild {
+			successor.parent?.left = successor.right
+			successor.right?.parent = successor.parent
+		} else {
+			successor.parent?.right = successor.right
+			successor.right?.parent = successor.parent
+		}
+		
+		successor.parent = node.parent
+		successor.left = node.left
+		successor.right = node.right
+		
+		successor.left?.parent = successor
+		successor.right?.parent = successor
+		
+		if node === root { setRoot(to: successor) }
+		
+		return removedNode
 	}
 	
 	func successor(from node: Node<T>) -> Node<T> {
@@ -161,6 +190,7 @@ private extension BinarySearchTree {
 extension BinarySearchTree {
 	func setRoot(to node: Node<T>) {
 		self.root = node
+		root?.parent = nil
 	}
 }
 

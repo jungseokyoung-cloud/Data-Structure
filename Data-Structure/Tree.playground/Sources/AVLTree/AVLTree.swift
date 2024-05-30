@@ -1,99 +1,109 @@
 public class AVLTree<T: Comparable>: BinarySearchTree<T> {
 	/// tree에 값을 추가합니다.
 	public override func insert(_ value: T) {
-		super.insert(value)
+		let insertNode = super.performInsert(value)
+		var current = insertNode
 		
-		if let root = self.root {
-			self.balance(for: root)
+		while let temp = current {
+			current = self.balance(for: temp).parent
 		}
 	}
 	
 	public override func remove(_ value: T) -> T? {
-		let value = super.remove(value)
-
-		if let root = self.root {
-			self.balance(for: root)
+		guard let removeNode = search(value) else { return nil }
+		
+		defer { 
+			let node = super.performRemove(node: removeNode)
+			var current = node
+			
+			while let temp = current {
+				current = self.balance(for: temp).parent
+			}
 		}
 		
-		return value
+		return removeNode.value
 	}
 }
 
 private extension AVLTree {
-	func balance(for node: Node<T>) {
-		if let leftChild = node.left {
-			balance(for: leftChild)
-		} else if let rightChild = node.right{
-			balance(for: rightChild)
-		}
-		
-		rotate(for: node)
+	/// 균형을 잡힌 서브트리의 루트노드를 리턴합니다.
+	func balance(for node: Node<T>) -> Node<T> {
+		let node = rotate(for: node)
 		updateHeight(for: node)
+		return node
 	}
 	
-	func rotate(for node: Node<T>) {
-		guard node.balanceFactor > 1 || node.balanceFactor < -1 else { return }
-		
+	/// 회전을 한 후, 회전을 진행한 서브트리의 루트노드를 리턴합니다.
+	func rotate(for node: Node<T>) -> Node<T> {
+		guard node.balanceFactor > 1 || node.balanceFactor < -1 else { return node }
 		if node.balanceFactor == 2, let rightChild = node.right {
 			// RL Case
 			if let leftChild = rightChild.left {
-				rightRotate(for: rightChild, pivot: leftChild)
-				leftRotate(for: node, pivot: leftChild)
+				let pivot = rightRotate(for: rightChild, pivot: leftChild)
+				return leftRotate(for: node, pivot: pivot)
 				
 			// RR Case
 			} else {
-				leftRotate(for: node, pivot: rightChild)
+				return leftRotate(for: node, pivot: rightChild)
 			}
 		
 		} else if node.balanceFactor == -2, let leftChild = node.left {
 			// LR Case
-			if let rightChild = node.right, rightChild.balanceFactor == 1 {
-				leftRotate(for: leftChild, pivot: rightChild)
-				rightRotate(for: node, pivot: leftChild)
+			if let rightChild = leftChild.right {
+				let pivot = leftRotate(for: leftChild, pivot: rightChild)
+				return rightRotate(for: node, pivot: pivot)
 				
 			// LL Case
 			} else {
-				rightRotate(for: node, pivot: leftChild)
+				return rightRotate(for: node, pivot: leftChild)
 			}
 		}
+		
+		return node
 	}
 	
-	func leftRotate(for node: Node<T>, pivot: Node<T>) {
+	@discardableResult
+	func leftRotate(for node: Node<T>, pivot: Node<T>) -> Node<T> {
 		node.right = pivot.left
+		node.right?.parent = node
+		
+		if node.isRightChild {
+			node.parent?.right = pivot
+		} else {
+			node.parent?.left = pivot
+		}
+		pivot.parent = node.parent
 		pivot.left = node
-		
-		if node.isRightChild {
-			node.parent?.right = pivot
-		} else {
-			node.parent?.left = pivot
-		}
-		
-		pivot.parent = node.parent
 		node.parent = pivot
 		
 		if node === root { setRoot(to: pivot) }
 		
 		updateHeight(for: node)
 		updateHeight(for: pivot)
+		
+		return pivot
 	}
-	
-	func rightRotate(for node: Node<T>, pivot: Node<T>) {
+
+	@discardableResult
+	func rightRotate(for node: Node<T>, pivot: Node<T>) -> Node<T> {
 		node.left = pivot.right
-		pivot.right = node
+		node.left?.parent = node
 		
 		if node.isRightChild {
 			node.parent?.right = pivot
 		} else {
 			node.parent?.left = pivot
 		}
-
 		pivot.parent = node.parent
+		pivot.right = node
 		node.parent = pivot
 		
 		if node === root { setRoot(to: pivot) }
 		
 		updateHeight(for: node)
 		updateHeight(for: pivot)
+		
+		return pivot
 	}
 	
 	func updateHeight(for node: Node<T>) {
