@@ -1,4 +1,6 @@
 public class AVLTree<T: Comparable>: BinarySearchTree<T> {
+	override var nodeType: Node<T>.Type { AVLNode<T>.self }
+	
 	/// tree에 값을 추가합니다.
 	public override func insert(_ value: T) {
 		let insertNode = super.performInsert(value)
@@ -13,9 +15,8 @@ public class AVLTree<T: Comparable>: BinarySearchTree<T> {
 		guard let removeNode = search(value) else { return nil }
 		
 		defer { 
-			let node = super.performRemove(node: removeNode)
-			var current = node
-			
+			var current = super.performRemove(node: removeNode).parentNode
+
 			while let temp = current {
 				current = self.balance(for: temp).parent
 			}
@@ -35,7 +36,11 @@ private extension AVLTree {
 	
 	/// 회전을 한 후, 회전을 진행한 서브트리의 루트노드를 리턴합니다.
 	func rotate(for node: Node<T>) -> Node<T> {
-		guard node.balanceFactor > 1 || node.balanceFactor < -1 else { return node }
+		guard
+			let node = node as? AVLNode<T>,
+			node.balanceFactor > 1 || node.balanceFactor < -1
+		else { return node }
+		
 		if node.balanceFactor == 2, let rightChild = node.right {
 			// RL Case
 			if let leftChild = rightChild.left {
@@ -107,6 +112,7 @@ private extension AVLTree {
 	}
 	
 	func updateHeight(for node: Node<T>) {
-		node.height = max(node.left?.height ?? 0, node.right?.height ?? 0) + 1
+		guard let node = node as? AVLNode<T> else { return }
+		node.height = max((node.right as? AVLNode<T>)?.height ?? 0, (node.left as? AVLNode<T>)?.height ?? 0) + 1
 	}
 }
