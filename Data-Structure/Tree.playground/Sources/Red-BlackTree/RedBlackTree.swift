@@ -34,7 +34,8 @@ private extension RedBlackTree {
 		// 연속해서 빨간색이 나오지 않는 경우, 종료
 		guard
 			let parent = node.parent as? RedBlackNode<T>,
-			parent.isRed else { return node }
+			parent.isRed 
+		else { return node }
 		
 		if let uncle = node.uncle as? RedBlackNode<T>, uncle.isRed {
 			return recoloring(for: node)
@@ -49,27 +50,27 @@ private extension RedBlackTree {
 			let parent = node.parent as? RedBlackNode<T>,
 			let grandParent = parent.parent as? RedBlackNode<T>
 		else { return node }
-		
-		node.isRed = false
 		grandParent.isRed = true
-		
-		if let uncle = node.uncle as? RedBlackNode<T> { uncle.isRed = true }
-		
+
 		// LL Case
 		if node.isLeftChild && parent.isLeftChild {
+			parent.isRed = false
 			return rightRotate(for: grandParent, pivot: parent)
 			
 		// RR Case
 		} else if node.isRightChild && parent.isRightChild {
+			parent.isRed = false
 			return leftRotate(for: grandParent, pivot: parent)
 			
 		// LR Case
 		} else if node.isRightChild && parent.isLeftChild {
+			node.isRed = false
 			let pivot = leftRotate(for: parent, pivot: node)
 			return rightRotate(for: grandParent, pivot: pivot)
 			
 		// RL Case
 		} else {
+			node.isRed = false
 			let pivot = rightRotate(for: parent, pivot: node)
 			return leftRotate(for: grandParent, pivot: pivot)
 		}
@@ -113,10 +114,8 @@ private extension RedBlackTree {
 	func removeExtraBlack(parent: Node<T>?, replaceNode: Node<T>?) {
 		// Red-And-Black Node
 		if let replaceNode = replaceNode as? RedBlackNode<T>, replaceNode.isRed {
-			print("red-and Black")
 			replaceNode.isRed = false
 		} else {
-			print("doubleBlack")
 			removeDoublyBlack(parent: parent, doublyBlack: replaceNode)
 		}
 	}
@@ -124,15 +123,13 @@ private extension RedBlackTree {
 	func removeDoublyBlack(parent: Node<T>?, doublyBlack: Node<T>?) {
 		guard
 			let parent = parent as? RedBlackNode<T>,
-			let sibling = parent.left === doublyBlack ? parent.right : parent.left,
-			let sibling = sibling as? RedBlackNode<T>
+			let sibling = (parent.left === doublyBlack ? parent.right : parent.left) as? RedBlackNode<T>
 		else { return }
 		
 		if !sibling.isRed {
 			if 
 				let sibilingChild = (sibling.isLeftChild ? sibling.left : sibling.right) as? RedBlackNode<T>,
 				sibilingChild.isRed {
-				print("case4")
 				removeCase4(
 					parent: parent,
 					sibling: sibling,
@@ -141,19 +138,17 @@ private extension RedBlackTree {
 			} else if
 				let sibilingChild = (sibling.isLeftChild ? sibling.right : sibling.left) as? RedBlackNode<T>,
 				sibilingChild.isRed {
-				print("case3")
 				removeCase3(
 					parent: parent,
 					sibling: sibling,
 					child: sibilingChild
 				)
 			} else {
-				removeCase2(parent: parent, sbiling: sibling)
+				removeCase2(parent: parent, sibling: sibling)
 			}
 		} else {
 			removeCase1(parent: parent, sibling: sibling, node: doublyBlack as? RedBlackNode<T>)
 		}
-		
 	}
 
 	// 형제노드가 검정, 형제의  자식이 빨간 경우
@@ -189,16 +184,15 @@ private extension RedBlackTree {
 			rightRotate(for: sibling, pivot: child)
 		}
 		
-		guard 
-			let newChild = sibling.isLeftChild ? child.left : child.right,
-			let newChild = newChild as? RedBlackNode<T> 
+		guard
+			let newChild = (sibling.isLeftChild ? child.left : child.right) as? RedBlackNode<T>
 		else { return }
 		
 		removeCase4(parent: parent, sibling: child, child: newChild)
 	}
 	
-	func removeCase2(parent: RedBlackNode<T>, sbiling: RedBlackNode<T>) {
-		sbiling.isRed.toggle()
+	func removeCase2(parent: RedBlackNode<T>, sibling: RedBlackNode<T>) {
+		sibling.isRed.toggle()
 		// 부모에게 Extra-Black을 위임
 		removeExtraBlack(parent: parent.parent, replaceNode: parent)
 	}
