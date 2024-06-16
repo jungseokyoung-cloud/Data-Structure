@@ -1,29 +1,24 @@
-final class Node<T: Comparable> {
+import Foundation
+
+class Node<T: Comparable> {
 	var value: T
 	var left: Node?
 	var right: Node?
-	var height: Int
 	
 	weak var parent: Node?
 	
-	init(value: T, height: Int = 0) {
+	required init(value: T) {
 		self.value = value
-		self.height = height
 	}
 	
-	init(value: T, parent: Node<T>?, height: Int = 0) {
+	required init(value: T, parent: Node<T>?) {
 		self.value = value
 		self.parent = parent
-		self.height = height
 	}
 }
 
 // MARK: - Extension
 extension Node {
-	var balanceFactor: Int {
-		return (self.right?.height ?? 0) - (self.left?.height ?? 0)
-	}
-	
 	var isRoot: Bool {
 		parent == nil
 	}
@@ -42,5 +37,20 @@ extension Node {
 	
 	var hasLeftChild: Bool {
 		self.left != nil
+	}
+	
+	var uncle: Node? {
+		guard
+			let parent = parent,
+			let grandParent = parent.parent
+		else { return nil }
+		
+		return parent.isLeftChild ? grandParent.right : grandParent.left
+	}
+	
+	var sibling: Node? {
+		guard let parent = parent else { return nil }
+		
+		return isLeftChild ? parent.right : parent.left
 	}
 }

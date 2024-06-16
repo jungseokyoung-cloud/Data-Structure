@@ -1,9 +1,18 @@
 import Foundation
 
 public class BinarySearchTree<T: Comparable> {
+	/// 삭제되었을 때, 리턴하는 타입입니다.
+	struct RemoveReturnType {
+		let removedNode: Node<T>?
+		let replaceNode: Node<T>?
+		let parentNode: Node<T>?
+	}
+	
+	var nodeType: Node<T>.Type { Node<T>.self }
+	
 	/// 트리의 루트노드입니다.
 	private(set) var root: Node<T>?
-	
+
 	public var isEmpty: Bool { size == 0 }
 	
 	public private(set) var size: Int = 0
@@ -20,7 +29,7 @@ public class BinarySearchTree<T: Comparable> {
 	@discardableResult
 	func performInsert(_ value: T) -> Node<T>? {
 		guard let root else {
-			self.root = Node(value: value)
+			self.root = nodeType.init(value: value)
 			return root
 		}
 		
@@ -37,7 +46,7 @@ public class BinarySearchTree<T: Comparable> {
 				if let next = current.left {
 					current = next
 				} else {
-					let node = Node(value: value, parent: current)
+					let node = nodeType.init(value: value, parent: current)
 					current.left = node
 					
 					return node
@@ -46,7 +55,7 @@ public class BinarySearchTree<T: Comparable> {
 				if let next = current.right {
 					current = next
 				} else {
-					let node = Node(value: value, parent: current)
+					let node = nodeType.init(value: value, parent: current)
 					current.right = node
 					
 					return node
@@ -64,15 +73,16 @@ public class BinarySearchTree<T: Comparable> {
 		return node.value
 	}
 	
-	/// Remove작업을 수행한 후, 삭제된 위치의 노드를 리턴합니다.
+	/// Remove작업을 수행한 후, `RemoveReturnType`을 리턴합니다.
+	/// - Parameters:
+	/// 	- node: 삭제할 노드
+	/// - Returns: 삭제한 노드, 대체된 노드, 대체된 노드 위치의 부모노드를 리턴
 	@discardableResult
-	func performRemove(node: Node<T>) -> Node<T>? {
+	func performRemove(node: Node<T>) -> RemoveReturnType {
 		defer { size -= 1 }
-		
 		// 리프 노드인 경우
 		if node.isLeaf {
 			return removeLeafNode(node)
-			
 			// 왼쪽 자식만 존재하는 경우
 		} else if let leftNode = node.left, node.right == nil {
 			return removeOneChildNode(node, child: leftNode)
@@ -83,7 +93,7 @@ public class BinarySearchTree<T: Comparable> {
 			
 			// 자식이 두개인 노드인 경우
 		} else {
-			guard let rightNode = node.right else { return nil }
+			guard let rightNode = node.right else { return RemoveReturnType(removedNode: nil, replaceNode: nil, parentNode: nil) }
 			let successor = successor(from: rightNode)
 			
 			return removeTwoChildNode(node, successor: successor)
@@ -117,7 +127,7 @@ public class BinarySearchTree<T: Comparable> {
 
 // MARK: - Private Methods
 private extension BinarySearchTree {
-	func removeLeafNode(_ node: Node<T>) -> Node<T>? {
+	func removeLeafNode(_ node: Node<T>) -> RemoveReturnType {
 		defer {
 			if node.isLeftChild {
 				node.parent?.left = nil
@@ -128,10 +138,14 @@ private extension BinarySearchTree {
 			if node === root { root = nil }
 		}
 		
-		return node.parent
+		return RemoveReturnType(
+			removedNode: node,
+			replaceNode: nil, 
+			parentNode: node.parent
+		)
 	}
 	
-	func removeOneChildNode(_ node: Node<T>, child: Node<T>) -> Node<T>? {
+	func removeOneChildNode(_ node: Node<T>, child: Node<T>) -> RemoveReturnType {
 		defer {
 			if node.isLeftChild {
 				node.parent?.left = child
@@ -143,13 +157,18 @@ private extension BinarySearchTree {
 			
 			if node === root { setRoot(to: child) }
 		}
-		
-		return child
+
+		return RemoveReturnType(
+			removedNode: node,
+			replaceNode: child,
+			parentNode: node.parent
+		)
 	}
 	
-	func removeTwoChildNode(_ node: Node<T>, successor: Node<T>) -> Node<T>? {
-		var removedNode = successor.right == nil ? successor.parent : successor.right
-		if removedNode === node { removedNode = successor }
+	func removeTwoChildNode(_ node: Node<T>, successor: Node<T>) -> RemoveReturnType {
+		let replaceNode = successor.right
+		var removedParentNode = successor.right == nil ? successor.parent : successor.right
+		if removedParentNode === node { removedParentNode = successor }
 		
 		if node.isLeftChild {
 			node.parent?.left = successor
@@ -174,7 +193,11 @@ private extension BinarySearchTree {
 		
 		if node === root { setRoot(to: successor) }
 		
-		return removedNode
+		return RemoveReturnType(
+			removedNode: successor,
+			replaceNode: replaceNode,
+			parentNode: removedParentNode
+		)
 	}
 	
 	func successor(from node: Node<T>) -> Node<T> {
@@ -188,7 +211,7 @@ private extension BinarySearchTree {
 
 // MARK: - Internal Methods
 extension BinarySearchTree {
-	func setRoot(to node: Node<T>) {
+	func setRoot(to node: Node<T>?) {
 		self.root = node
 		root?.parent = nil
 	}
